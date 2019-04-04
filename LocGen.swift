@@ -65,7 +65,7 @@ func main() {
         translationsContainer.translations
           .forEach { translation in write(translation: translation, baseDirURL: outputDirPath) }
       } catch {
-        print("Cannot process input data")
+        print("Cannot process input data ⛔️")
         print(error.localizedDescription)
       }
     } else {
