@@ -1,6 +1,10 @@
+function onOpen() {
+  var menuEntries = [{name: "Export JSON", functionName: "main"}];
+  SpreadsheetApp.getActiveSpreadsheet().addMenu("Export JSON", menuEntries);
+}
 function main() {
-  var rowData = rowData();
-  var localizationJSON = exportAsJSON(rowData);
+  var _rowData = rowData();
+  var localizationJSON = exportAsJSON(_rowData);
   addFileToDrive(localizationJSON);
 }
 
@@ -12,9 +16,12 @@ function rowData() {
 
 function exportAsJSON(rowData) {
   var output = {};
+  var translations = [];
 
   for (var i = 1; i < rowData[0].length; i++) {
+    var langObj = {};
     var lang = rowData[0][i];
+    langObj["language"] = lang;
     var contents = [];
     for (var j = 1; j < rowData.length; j++) {
       var term = rowData[j][0];
@@ -24,8 +31,11 @@ function exportAsJSON(rowData) {
       termTemp["value"] = def;
       contents.push(termTemp);
     }
-    output[lang] = contents;
+    langObj["terms"] = contents;
+    translations.push(langObj);
   }
+  output["translations"] = translations;
+
   return output;
 };
 
@@ -36,7 +46,7 @@ function testExport() {
     ["key1", "val1"]
   ];
 
-  console.log(exportAsJSON(testValue));
+  Logger.log(exportAsJSON(testValue));
 }
 
 function addFileToDrive(file) {
@@ -50,10 +60,10 @@ function addFileToDrive(file) {
       var file = previousFiles.next()
       file.setTrashed(true)
     }
-    localizationsFolder.createFile(name + ".json", JSON.stringify(file, null, 2), MimeType.JAVASCRIPT);
+    localizationsFolder.createFile(name + ".json", JSON.stringify(file, null, 2), MimeType.PLAIN_TEXT);
   } else {
     var localizationsFolder = DriveApp.createFolder('Localization')
-    localizationsFolder.createFile(name + ".json", JSON.stringify(file, null, 2), MimeType.JAVASCRIPT);
+    localizationsFolder.createFile(name + ".json", JSON.stringify(file, null, 2), MimeType.PLAIN_TEXT);
   }
 }
 
@@ -92,4 +102,4 @@ function transpose(a) {
   return t;
 };
 
-testExport();
+// testExport();
