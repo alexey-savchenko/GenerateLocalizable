@@ -1,29 +1,43 @@
 function main() {
-  var localizationJSON = exportSheetAsJSON()
-  addFileToDrive(localizationJSON)
+  var rowData = rowData();
+  var localizationJSON = exportAsJSON(rowData);
+  addFileToDrive(localizationJSON);
 }
 
-function exportSheetAsJSON() {
+function rowData() {
   var sheet = SpreadsheetApp.getActiveSheet();
   var rows = sheet.getDataRange();
-  var numRows = rows.getNumRows();
-  var numCols = rows.getNumColumns();
-  var values = rows.getValues();
+  return rows.getValues();
+}
 
+function exportAsJSON(rowData) {
   var output = {};
 
-  for (var i = 1; i < values[0].length; i++) {
-    var lang = values[0][i];
-    var contents = {};
-    for (var j = 1; j < values.length; j++) {
-      var term = values[j][0];
-      var def = values[j][i];
-      contents[term] = def;
+  for (var i = 1; i < rowData[0].length; i++) {
+    var lang = rowData[0][i];
+    var contents = [];
+    for (var j = 1; j < rowData.length; j++) {
+      var term = rowData[j][0];
+      var def = rowData[j][i];
+      var termTemp = {};
+      termTemp["key"] = term;
+      termTemp["value"] = def;
+      contents.push(termTemp);
     }
     output[lang] = contents;
   }
   return output;
 };
+
+function testExport() {
+  var testValue = [
+    ["KEY", "EN"],
+    ["key0", "val0"],
+    ["key1", "val1"]
+  ];
+
+  console.log(exportAsJSON(testValue));
+}
 
 function addFileToDrive(file) {
   var name = SpreadsheetApp.getActiveSpreadsheet().getName();
@@ -77,3 +91,5 @@ function transpose(a) {
 
   return t;
 };
+
+testExport();

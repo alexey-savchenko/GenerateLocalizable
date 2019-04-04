@@ -77,6 +77,7 @@ func main() {
         }
         container[lang] = terms
       }
+      
       let outputDirPath = CommandLine.arguments
         .firstIndex(of: Token.outputProjectPath.rawValue)
         .flatMap { CommandLine.arguments[safe: $0 + 1] }
