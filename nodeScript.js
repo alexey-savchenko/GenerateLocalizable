@@ -1,4 +1,4 @@
-const exec = require('child_process').exec, child;
+const exec = require('child_process').exec;
 const fs = require('fs');
 const readline = require('readline');
 const {
@@ -125,7 +125,6 @@ function getTranslations(auth) {
         reject(err);
       }
       const rows = res.data.values;
-      // console.log(rows);
       resolve(rows);
     });
   });
@@ -136,14 +135,14 @@ function parseToJSON(rowsArray) {
     var output = {};
     var translations = [];
 
-    for (var i = 1; i < rowData[0].length; i++) {
+    for (var i = 1; i < rowsArray[0].length; i++) {
       var langObj = {};
-      var lang = rowData[0][i];
+      var lang = rowsArray[0][i];
       langObj["language"] = lang;
       var contents = [];
-      for (var j = 1; j < rowData.length; j++) {
-        var term = rowData[j][0];
-        var def = rowData[j][i];
+      for (var j = 1; j < rowsArray.length; j++) {
+        var term = rowsArray[j][0];
+        var def = rowsArray[j][i];
         var termTemp = {};
         termTemp["key"] = term;
         termTemp["value"] = def;
@@ -161,8 +160,8 @@ function saveToDisk(translationsJSONObject) {
   const tempFilePath = "./temp.json";
   return new Promise((resolve, reject) => {
     fs.writeFile(tempFilePath, JSON.stringify(translationsJSONObject, null, 2), (error) => {
-      if (err) {
-        reject(err);
+      if (error) {
+        reject(error);
       } else {
         resolve(tempFilePath);
       }
