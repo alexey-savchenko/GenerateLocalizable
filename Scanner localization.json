@@ -1,0 +1,151 @@
+{
+  "translations": [
+    {
+      "language": "EN",
+      "terms": [
+        {
+          "key": "tab_item_delete",
+          "value": "Delete"
+        },
+        {
+          "key": "tab_item_share",
+          "value": "Share"
+        },
+        {
+          "key": "tab_item_move",
+          "value": "Move"
+        },
+        {
+          "key": "tab_item_merge",
+          "value": "Merge"
+        },
+        {
+          "key": "apply",
+          "value": "Apply"
+        },
+        {
+          "key": "invalid_path",
+          "value": "Invalid file path"
+        },
+        {
+          "key": "olx",
+          "value": "qwe"
+        },
+        {
+          "key": "olx",
+          "value": "qwe"
+        },
+        {
+          "key": "olx",
+          "value": "qwe"
+        },
+        {
+          "key": "olx",
+          "value": "qwe"
+        },
+        {
+          "key": "olx",
+          "value": "qwe"
+        }
+      ]
+    },
+    {
+      "language": "FR",
+      "terms": [
+        {
+          "key": "tab_item_delete",
+          "value": "Effacer"
+        },
+        {
+          "key": "tab_item_share",
+          "value": "Partager"
+        },
+        {
+          "key": "tab_item_move",
+          "value": "Bouge toi"
+        },
+        {
+          "key": "tab_item_merge",
+          "value": "Fusionner"
+        },
+        {
+          "key": "apply",
+          "value": "Appliquer"
+        },
+        {
+          "key": "invalid_path",
+          "value": "chemin de fichier non valide"
+        },
+        {
+          "key": "olx",
+          "value": "asd"
+        },
+        {
+          "key": "olx",
+          "value": "asd"
+        },
+        {
+          "key": "olx",
+          "value": "asd"
+        },
+        {
+          "key": "olx",
+          "value": "asd"
+        },
+        {
+          "key": "olx",
+          "value": "asd"
+        }
+      ]
+    },
+    {
+      "language": "AR",
+      "terms": [
+        {
+          "key": "tab_item_delete",
+          "value": "حذف"
+        },
+        {
+          "key": "tab_item_share",
+          "value": "شارك"
+        },
+        {
+          "key": "tab_item_move",
+          "value": "نقل"
+        },
+        {
+          "key": "tab_item_merge",
+          "value": "دمج"
+        },
+        {
+          "key": "apply",
+          "value": "تطبيق"
+        },
+        {
+          "key": "invalid_path",
+          "value": "مسار الملف غير صالح"
+        },
+        {
+          "key": "olx",
+          "value": "zxc"
+        },
+        {
+          "key": "olx",
+          "value": "zxc"
+        },
+        {
+          "key": "olx",
+          "value": "zxc"
+        },
+        {
+          "key": "olx",
+          "value": "zxc"
+        },
+        {
+          "key": "olx",
+          "value": "zxc"
+        }
+      ]
+    }
+  ]
+}
