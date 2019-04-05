@@ -12,26 +12,35 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
 // time.
 const TOKEN_PATH = 'token.json';
 const EXPORT_PATH_TOKEN = '-e';
+const TARGET_SHEET_ID_TOKEN = '-i';
 
 // Load client secrets from a local file.
 fs.readFile('credentials.json', (err, content) => {
   if (err) return console.log('Error loading client secret file:', err);
-  // Authorize a client with credentials, then call the Google Sheets API.
-  var exportPath = require("os").homedir() + "/Documents";
+
+  var targetSheetID = "";
+  var targetSheetTokenIndex = process.argv.indexOf(TARGET_SHEET_ID_TOKEN);
+  if ((targetSheetTokenIndex + 1) > 0) {
+    targetSheetID = process.argv[targetSheetTokenIndex + 1];
+  } else {
+    return console.log("🚨 Please pass target sheet ID");
+  }
+
+  var exportDirPath = require("os").homedir() + "/Documents";
   var exportPathTokenIndex = process.argv.indexOf(EXPORT_PATH_TOKEN);
-  if (exportPathTokenIndex != -1) {
-    exportPath = process.argv[exportPathTokenIndex + 1];
+  if ((exportPathTokenIndex + 1) > 0) {
+    exportDirPath = process.argv[exportPathTokenIndex + 1];
   }
 
   authorize(JSON.parse(content))
     .then(
       fulfilledAuthClient => {
-        getTranslations(fulfilledAuthClient)
+        getTranslations(fulfilledAuthClient, targetSheetID)
           .then(parseToJSON)
           .then(saveToDisk)
           .then(
             (jsonPath) => {
-              return makeLocalizableFiles(jsonPath, exportPath);
+              return makeLocalizableFiles(jsonPath, exportDirPath);
             }
           )
           .catch(error => {
@@ -40,12 +49,16 @@ fs.readFile('credentials.json', (err, content) => {
       },
       rejectedAuthClient => {
         getNewToken(rejectedAuthClient)
-          .then(getTranslations)
+          .then(
+            (authenticatedClient) => {
+              return getTranslations(authenticatedClient, targetSheetID);
+            }
+          )
           .then(parseToJSON)
           .then(saveToDisk)
           .then(
             (jsonPath) => {
-              return makeLocalizableFiles(jsonPath, exportPath);
+              return makeLocalizableFiles(jsonPath, exportDirPath);
             }
           )
           .catch(error => {
@@ -59,7 +72,6 @@ fs.readFile('credentials.json', (err, content) => {
  * Create an OAuth2 client with the given credentials, and then execute the
  * given callback function.
  * @param {Object} credentials The authorization client credentials.
- * @param {function} callback The callback to call with the authorized client.
  */
 function authorize(credentials) {
   const {
@@ -72,12 +84,11 @@ function authorize(credentials) {
   return new Promise((resolve, reject) => {
     fs.readFile(TOKEN_PATH, (err, token) => {
       if (err) {
-        // return getNewToken(oAuth2Client, callback);
         reject(oAuth2Client);
+      } else {
+        oAuth2Client.setCredentials(JSON.parse(token));
+        resolve(oAuth2Client);
       }
-      oAuth2Client.setCredentials(JSON.parse(token));
-      // callback(oAuth2Client);
-      resolve(oAuth2Client)
     });
   });
 }
@@ -119,14 +130,14 @@ function getNewToken(oAuth2Client) {
  * @see https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
  * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
  */
-function getTranslations(auth) {
+function getTranslations(auth, targetSheetID) {
   return new Promise((resolve, reject) => {
     const sheets = google.sheets({
       version: 'v4',
       auth
     });
     sheets.spreadsheets.values.get({
-      spreadsheetId: '1oV3bQtL0gNx1wya9NoEH-O3Bvq3wNN2g6s8urlRM36Q',
+      spreadsheetId: targetSheetID,
       range: 'Sheet1!A1:ZZ',
     }, (err, res) => {
       if (err) {
