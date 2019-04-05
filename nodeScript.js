@@ -25,7 +25,7 @@ fs.readFile('credentials.json', (err, content) => {
           .then(saveToDisk)
           .then(makeLocalizableFiles)
           .catch(error => {  
-            console.log("Error occured: " + error);
+            console.log("🚨 Error occured: " + error);
           });
       },
       rejectedAuthClient => {
@@ -35,7 +35,7 @@ fs.readFile('credentials.json', (err, content) => {
           .then(saveToDisk)
           .then(makeLocalizableFiles)
           .catch(error => {  
-            console.log("Error occured: " + error);
+            console.log("🚨 Error occured: " + error);
           });
       }
     )
@@ -171,12 +171,11 @@ function saveToDisk(translationsJSONObject) {
 
 function makeLocalizableFiles(sourceJSONFilePath) {
   return new Promise((resolve, reject) => {
-    console.log("Received path!!!");
     exec("./LocGen.swift -i " + sourceJSONFilePath, (err, stdout, stderr) => {
       if (err) {
         reject(err)
       }
-      console.log("Success!");
+      console.log("Success! 🤩");
     });
   });
 }
