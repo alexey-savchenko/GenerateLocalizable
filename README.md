@@ -1,4 +1,4 @@
-# LocGen
+# LocGen.
 Easily integrate localization to your iOS apps using Google Sheets, Node.js and Swift!
 
 ### Prequisites: 
@@ -23,3 +23,27 @@ Once process completes download your `credentials.json` file:
 ![Google Sheets APIs site](https://i.imgur.com/epIpGXW.png)
 
 ### Usage
+
+Your sheet in Google Sheets should have format like this
+
+KEY | Language 1 | Language 2 | Other languages
+--- | ---------- | ---------- | ---------------
+term_key_0 | Language 1 translation of term | Language 2 translation of term | Language 3 translation of term
+term_key_1 | Language 1 translation of term | Language 2 translation of term | Language 3 translation of term
+term_key_2 | Language 1 translation of term | Language 2 translation of term | Language 3 translation of term
+
+**Important!** Make sure the sheet that contains localizations has name `Sheet1`.
+
+You will need an `ID` of your Google spreadsheet. You can obtain it from url while spreadsheet is open:
+
+![Google Sheets key](https://i.imgur.com/9i3mRZQ.png)
+
+To execute script, locate directory containing contents of this repo in Terminal. 
+
+Type `node GenerateLocalizable.js -i YOUR_GOOGLE_SHEET_ID -e EXPORT_PATH`
+
+Where `EXPORT_PATH` can be any path, but most likely you would like to export localization straight to your project.
+In this case, specify path to directory where your `*.lproj` folders are stored in your project. For example `/Users/YOUR_USER_NAME/Documents/YOUR_PROJECT_NAME/Resources`.
+
+During first run you will be prompted to authorize, follow the instructions in Terminal.
+After authorization, process continues and if everything is OK, message will appear: Success! 🤩
