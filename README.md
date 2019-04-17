@@ -32,6 +32,8 @@ term_key_0 | Language 1 translation of term | Language 2 translation of term | L
 term_key_1 | Language 1 translation of term | Language 2 translation of term | Language 3 translation of term
 term_key_2 | Language 1 translation of term | Language 2 translation of term | Language 3 translation of term
 
+Language 1, Language 2 etc. are language codes relative to ISO 639-1 (en for English, fr for French etc.).
+
 **Important!** Make sure the sheet that contains localizations has name `Sheet1`.
 
 You will need an `ID` of your Google spreadsheet. You can obtain it from url while spreadsheet is open:
