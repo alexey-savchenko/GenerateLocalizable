@@ -276,6 +276,7 @@ function saveToDisk(objectType, translationsJSONObject) {
 function makeLocalizableFiles(sourceJSONFilePath, exportDirPath, launchMode) {
 	return new Promise((resolve, reject) => {
 		console.log("Exporting to " + exportDirPath);
+		exec("chmod +x WriteLocalizable.swift")
 		exec("./WriteLocalizable.swift" + " -i " + sourceJSONFilePath + " -o " + exportDirPath + " -m " + launchMode, (err, stdout, stderr) => {
 			if (err) {
 				console.trace();
