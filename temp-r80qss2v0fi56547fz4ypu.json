@@ -1,0 +1,40 @@
+{
+  "translations": [
+    {
+      "language": "en",
+      "terms": [
+        {
+          "key": "NSCameraUsageDescription",
+          "value": "Application is required to use camera"
+        }
+      ]
+    },
+    {
+      "language": "es",
+      "terms": [
+        {
+          "key": "NSCameraUsageDescription",
+          "value": "se requiere la aplicación a utilizar la cámara"
+        }
+      ]
+    },
+    {
+      "language": "ja",
+      "terms": [
+        {
+          "key": "NSCameraUsageDescription",
+          "value": "アプリケーションは、カメラを使用する必要があります"
+        }
+      ]
+    },
+    {
+      "language": "it",
+      "terms": [
+        {
+          "key": "NSCameraUsageDescription",
+          "value": "L'applicazione è necessario per utilizzare fotocamera"
+        }
+      ]
+    }
+  ]
+}

@@ -34,7 +34,7 @@ term_key_2 | Language 1 translation of term | Language 2 translation of term | L
 
 Language 1, Language 2 etc. are language codes relative to ISO 639-1 (en for English, fr for French etc.).
 
-**Important!** Make sure the sheet that contains localizations has name `Sheet1`.
+**Important!** Make sure the sheet that contains localizations has name `LocalizableStrings`.
 
 You will need an `ID` of your Google spreadsheet. You can obtain it from url while spreadsheet is open:
 
@@ -42,7 +42,7 @@ You will need an `ID` of your Google spreadsheet. You can obtain it from url whi
 
 To execute script, locate directory containing contents of this repo in Terminal. 
 
-Type `node GenerateLocalizable.js -i YOUR_GOOGLE_SHEET_ID -e EXPORT_PATH`
+Type `node LocalizeStrings.js -i YOUR_GOOGLE_SHEET_ID -e EXPORT_PATH`
 
 Where `EXPORT_PATH` can be any path, but most likely you would like to export localization straight to your project.
 In this case, specify path to directory where your `*.lproj` folders are stored in your project. For example `/Users/YOUR_USER_NAME/Documents/YOUR_PROJECT_NAME/Resources`.
