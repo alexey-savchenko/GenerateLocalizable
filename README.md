@@ -41,9 +41,10 @@ You will need an `ID` of your Google spreadsheet. You can obtain it from url whi
 ![Google Sheets key](https://i.imgur.com/9i3mRZQ.png)
 
 There are 3 available modes of execution:
-    1) `strings`
-    2) `plist`
-    3) `strings+plist`
+
+* `strings`
+* `plist`
+* `strings+plist`
 
 To localize `Info.plist` in your app you should add a page to your Google Sheet with name `LocalizablePlist`.
 
