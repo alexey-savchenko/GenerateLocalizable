@@ -40,9 +40,19 @@ You will need an `ID` of your Google spreadsheet. You can obtain it from url whi
 
 ![Google Sheets key](https://i.imgur.com/9i3mRZQ.png)
 
+There are 3 available modes of execution:
+    * `strings`
+    * `plist`
+    * `strings+plist`
+
+To localize `Info.plist` in your app you should add a page to your Google Sheet with name `LocalizablePlist`.
+
+To specify mode you should pass one after `-m` token.
+Default is `strings`.
+
 To execute script, locate directory containing contents of this repo in Terminal. 
 
-Type `node LocalizeStrings.js -i YOUR_GOOGLE_SHEET_ID -e EXPORT_PATH`
+Type `node LocalizeStrings.js -m SELECTED_MODE -i YOUR_GOOGLE_SHEET_ID -e EXPORT_PATH`
 
 Where `EXPORT_PATH` can be any path, but most likely you would like to export localization straight to your project.
 In this case, specify path to directory where your `*.lproj` folders are stored in your project. For example `/Users/YOUR_USER_NAME/Documents/YOUR_PROJECT_NAME/Resources`.
