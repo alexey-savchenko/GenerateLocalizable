@@ -55,11 +55,14 @@ fs.readFile('credentials.json', (err, content) => {
 				switch (launchMode) {
 					case LOCALIZABLE_STINGS_MODE:
 						jobs.push(getLocalizableStrings(fulfilledAuthClient, targetSheetID))
+						break
 					case LOCALIZABLE_PLIST_MODE:
 						jobs.push(getLocalizablePlistStrings(fulfilledAuthClient, targetSheetID))
+						break
 					case LOCALIZABLE_STINGS_PLIST_MODE:
 						jobs.push(getLocalizableStrings(fulfilledAuthClient, targetSheetID))
 						jobs.push(getLocalizablePlistStrings(fulfilledAuthClient, targetSheetID))
+						break
 				}
 
 				processLocalizationJobs(jobs, exportDirPath);
@@ -73,11 +76,14 @@ fs.readFile('credentials.json', (err, content) => {
 						switch (launchMode) {
 							case LOCALIZABLE_STINGS_MODE:
 								jobs.push(getLocalizableStrings(fulfilledAuthClient, targetSheetID))
+								break
 							case LOCALIZABLE_PLIST_MODE:
 								jobs.push(getLocalizablePlistStrings(fulfilledAuthClient, targetSheetID))
+								break
 							case LOCALIZABLE_STINGS_PLIST_MODE:
 								jobs.push(getLocalizableStrings(fulfilledAuthClient, targetSheetID))
 								jobs.push(getLocalizablePlistStrings(fulfilledAuthClient, targetSheetID))
+								break
 						}
 
 						processLocalizationJobs(jobs, exportDirPath);
@@ -85,22 +91,6 @@ fs.readFile('credentials.json', (err, content) => {
 			}
 		)
 });
-
-function makeLocalizationJobs(authenticatedClient, targetSheetID, launchMode) {
-	var jobs = [];
-
-	switch (launchMode) {
-		case LOCALIZABLE_STINGS_MODE:
-			jobs.push(getLocalizableStrings(fulfilledAuthClient, targetSheetID))
-		case LOCALIZABLE_PLIST_MODE:
-			jobs.push(getLocalizablePlistStrings(fulfilledAuthClient, targetSheetID))
-		case LOCALIZABLE_STINGS_PLIST_MODE:
-			jobs.push(getLocalizableStrings(fulfilledAuthClient, targetSheetID))
-			jobs.push(getLocalizablePlistStrings(fulfilledAuthClient, targetSheetID))
-	}
-
-	return jobs;
-}
 
 function processLocalizationJobs(jobs, exportDirPath) {
 	Promise
@@ -118,11 +108,11 @@ function processLocalizationJobs(jobs, exportDirPath) {
 			return Promise.all(promises)
 		})
 		.then((value) => {
-			return value.forEach(val => {
-				makeLocalizableFiles(val[1], exportDirPath, val[0]);
+			return value.map(val => {
+				return makeLocalizableFiles(val[1], exportDirPath, val[0]);
 			});
 		})
-		// .then((promises) => { return Promise.all(promises) })
+		.then((promises) => { return Promise.all(promises) })
 		.then((value) => {
 			console.log(value);
 		})
@@ -237,7 +227,6 @@ function getLocalizablePlistStrings(auth, targetSheetID) {
 }
 
 function parseToJSON(rowsArray) {
-	// return new Promise((resolve) => {
 	var output = {};
 	var translations = [];
 
@@ -259,23 +248,25 @@ function parseToJSON(rowsArray) {
 	}
 	output["translations"] = translations;
 	return output;
-	// });
 }
 
 function saveToDisk(objectType, translationsJSONObject) {
 	return new Promise((resolve, reject) => {
 		const rand = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-		const tempFilePath = "./temp-" + rand + ".json";
+		const tempFilePath = "./temp/temp-" + rand + ".json";
+
+		var dir = './temp';
+
+		if (!fs.existsSync(dir)) {
+			fs.mkdirSync(dir);
+		}
+
 		console.log(tempFilePath);
 		fs.writeFile(tempFilePath, JSON.stringify(translationsJSONObject, null, 2), (error) => {
 			if (error) {
 				console.trace();
-				console.log(error);
 				reject(error);
-				// return [];
 			} else {
-				console.log("Saved to disk " + objectType);
-				// return [objectType, tempFilePath];
 				resolve([objectType, tempFilePath]);
 			}
 		});
@@ -290,7 +281,7 @@ function makeLocalizableFiles(sourceJSONFilePath, exportDirPath, launchMode) {
 				console.trace();
 				reject(err)
 			} else {
-				console.log("Export of " + launchMode + " succeeded! 🤩");
+				// console.log("Export of " + launchMode + " succeeded! 🤩");
 				resolve("Export of " + launchMode + " succeeded! 🤩")
 			}
 		});
