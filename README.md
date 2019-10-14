@@ -53,7 +53,7 @@ Default is `strings`.
 
 To execute script, locate directory containing contents of this repo in Terminal. 
 
-Type `node LocalizeStrings.js -m SELECTED_MODE -i YOUR_GOOGLE_SHEET_ID -e EXPORT_PATH`
+Type `node GenerateLocalizable.js -m SELECTED_MODE -i YOUR_GOOGLE_SHEET_ID -e EXPORT_PATH`
 
 Where `EXPORT_PATH` can be any path, but most likely you would like to export localization straight to your project.
 In this case, specify path to directory where your `*.lproj` folders are stored in your project. For example `/Users/YOUR_USER_NAME/Documents/YOUR_PROJECT_NAME/Resources`.
