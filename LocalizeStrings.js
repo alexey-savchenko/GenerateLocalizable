@@ -25,22 +25,22 @@ const LOCALIZABLE_STINGS_PLIST_MODE = "strings+plist";
 fs.readFile('credentials.json', (err, content) => {
 	if (err) return console.log('Error loading client secret file:', err);
 
-	var targetSheetID = "";
-	var targetSheetTokenIndex = process.argv.indexOf(TARGET_SHEET_ID_TOKEN);
+	let targetSheetID = "";
+	let targetSheetTokenIndex = process.argv.indexOf(TARGET_SHEET_ID_TOKEN);
 	if ((targetSheetTokenIndex + 1) > 0) {
 		targetSheetID = process.argv[targetSheetTokenIndex + 1];
 	} else {
 		return console.log("🚨 Please pass target sheet ID");
 	}
 
-	var exportDirPath = require("os").homedir() + "/Documents";
-	var exportPathTokenIndex = process.argv.indexOf(EXPORT_PATH_TOKEN);
+	let exportDirPath = require("os").homedir() + "/Documents";
+	let exportPathTokenIndex = process.argv.indexOf(EXPORT_PATH_TOKEN);
 	if ((exportPathTokenIndex + 1) > 0) {
 		exportDirPath = process.argv[exportPathTokenIndex + 1];
 	}
 
-	var launchMode = LOCALIZABLE_STINGS_MODE
-	var launchModeTokenIndex = process.argv.indexOf(TARGET_MODE_TOKEN);
+	let launchMode = LOCALIZABLE_STINGS_MODE
+	let launchModeTokenIndex = process.argv.indexOf(TARGET_MODE_TOKEN);
 	if ((launchModeTokenIndex + 1) > 0) {
 		launchMode = process.argv[launchModeTokenIndex + 1];
 	}
@@ -50,7 +50,7 @@ fs.readFile('credentials.json', (err, content) => {
 	authorize(JSON.parse(content))
 		.then(
 			(fulfilledAuthClient) => {
-				var jobs = [];
+				let jobs = [];
 
 				switch (launchMode) {
 					case LOCALIZABLE_STINGS_MODE:
@@ -71,7 +71,7 @@ fs.readFile('credentials.json', (err, content) => {
 			(rejectedAuthClient) => {
 				getNewToken(rejectedAuthClient)
 					.then((fulfilledAuthClient) => {
-						var jobs = [];
+						let jobs = [];
 
 						switch (launchMode) {
 							case LOCALIZABLE_STINGS_MODE:
@@ -227,18 +227,18 @@ function getLocalizablePlistStrings(auth, targetSheetID) {
 }
 
 function parseToJSON(rowsArray) {
-	var output = {};
-	var translations = [];
+	let output = {};
+	let translations = [];
 
-	for (var i = 1; i < rowsArray[0].length; i++) {
-		var langObj = {};
-		var lang = rowsArray[0][i];
+	for (let i = 1; i < rowsArray[0].length; i++) {
+		let langObj = {};
+		let lang = rowsArray[0][i];
 		langObj["language"] = lang;
-		var contents = [];
-		for (var j = 1; j < rowsArray.length; j++) {
-			var term = rowsArray[j][0];
-			var def = rowsArray[j][i];
-			var termTemp = {};
+		let contents = [];
+		for (let j = 1; j < rowsArray.length; j++) {
+			let term = rowsArray[j][0];
+			let def = rowsArray[j][i];
+			let termTemp = {};
 			termTemp["key"] = term;
 			termTemp["value"] = def;
 			contents.push(termTemp);
@@ -253,12 +253,11 @@ function parseToJSON(rowsArray) {
 function saveToDisk(objectType, translationsJSONObject) {
 	return new Promise((resolve, reject) => {
 		const rand = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-		const tempFilePath = "./temp/temp-" + rand + ".json";
+		const tempDirPath = './temp';
+		const tempFilePath = tempDirPath + "/temp-" + rand + ".json";
 
-		var dir = './temp';
-
-		if (!fs.existsSync(dir)) {
-			fs.mkdirSync(dir);
+		if (!fs.existsSync(tempDirPath)) {
+			fs.mkdirSync(tempDirPath);
 		}
 
 		console.log(tempFilePath);
