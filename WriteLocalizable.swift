@@ -28,8 +28,21 @@ struct Translation: Codable {
   let terms: [Term]
 }
 
-struct Term: Codable {
+struct Term {
   let key, value: String
+  
+  private enum CodingKeys: String, CodingKey {
+    case key
+    case value
+  }
+}
+
+extension Term: Decodable {
+  init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.value = try container.decodeIfPresent(String.self, forKey: .value) ?? "Invalid_term_key"
+    self.key = try container.decodeIfPresent(String.self, forKey: .key) ?? "Missing"
+  }
 }
 
 func termsDefinitionsToString(_ inputArray: [Term]) -> String {
