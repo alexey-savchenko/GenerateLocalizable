@@ -37,11 +37,17 @@ struct Term {
   }
 }
 
-extension Term: Decodable {
+extension Term: Codable {
   init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     self.value = try container.decodeIfPresent(String.self, forKey: .value) ?? "Invalid_term_key"
     self.key = try container.decodeIfPresent(String.self, forKey: .key) ?? "Missing"
+  }
+  
+  func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(key, forKey: .key)
+    try container.encode(value, forKey: .value)
   }
 }
 
