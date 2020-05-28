@@ -1,13 +1,9 @@
 const exec = require('child_process').exec;
 const fs = require('fs');
-const readline = require('readline');
+const auth = require('./GoogleAuth')
 const { google } = require('googleapis');
+const SCOPE = ['https://www.googleapis.com/auth/spreadsheets'];
 
-// If modifying these scopes, delete token.json.
-const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
-// The file token.json stores the user's access and refresh tokens, and is
-// created automatically when the authorization flow completes for the first
-// time.
 const TOKEN_PATH = 'token.json';
 const EXPORT_PATH_TOKEN = '-e';
 const TARGET_SHEET_ID_TOKEN = '-i';
@@ -18,76 +14,65 @@ const LOCALIZABLE_STINGS_MODE = "strings";
 const LOCALIZABLE_PLIST_MODE = "plist";
 const LOCALIZABLE_STINGS_PLIST_MODE = "strings+plist";
 
-// Load client secrets from a local file.
-fs.readFile('credentials.json', (err, content) => {
-	if (err) return console.log('Error loading client secret file:', err);
-
-	let targetSheetID = "";
-	let targetSheetTokenIndex = process.argv.indexOf(TARGET_SHEET_ID_TOKEN);
-	if ((targetSheetTokenIndex + 1) > 0) {
-		targetSheetID = process.argv[targetSheetTokenIndex + 1];
-	} else {
-		return console.log("🚨 Please pass target sheet ID");
+// Check scopes stored in token
+fs.readFile(TOKEN_PATH, (err, content) => {
+	if (!err) {
+		let _content = JSON.parse(content);
+		let scope = _content.scope;
+		if (scope != SCOPE) {
+			fs.unlinkSync(TOKEN_PATH)
+		}
 	}
+})
 
-	let exportDirPath = require("os").homedir() + "/Documents";
-	let exportPathTokenIndex = process.argv.indexOf(EXPORT_PATH_TOKEN);
-	if ((exportPathTokenIndex + 1) > 0) {
-		exportDirPath = process.argv[exportPathTokenIndex + 1];
-	}
+let targetSheetID = "";
+let targetSheetTokenIndex = process.argv.indexOf(TARGET_SHEET_ID_TOKEN);
+if ((targetSheetTokenIndex + 1) > 0) {
+	targetSheetID = process.argv[targetSheetTokenIndex + 1];
+} else {
+	return console.log("🚨 Please pass target sheet ID");
+}
 
-	let launchMode = LOCALIZABLE_STINGS_MODE
-	let launchModeTokenIndex = process.argv.indexOf(TARGET_MODE_TOKEN);
-	if ((launchModeTokenIndex + 1) > 0) {
-		launchMode = process.argv[launchModeTokenIndex + 1];
-	}
+let exportDirPath = require("os").homedir() + "/Documents";
+let exportPathTokenIndex = process.argv.indexOf(EXPORT_PATH_TOKEN);
+if ((exportPathTokenIndex + 1) > 0) {
+	exportDirPath = process.argv[exportPathTokenIndex + 1];
+}
 
-	console.log("Requesting " + launchMode);
+let launchMode = LOCALIZABLE_STINGS_MODE
+let launchModeTokenIndex = process.argv.indexOf(TARGET_MODE_TOKEN);
+if ((launchModeTokenIndex + 1) > 0) {
+	launchMode = process.argv[launchModeTokenIndex + 1];
+}
 
-	authorize(JSON.parse(content))
-		.then(
-			(fulfilledAuthClient) => {
-				let jobs = [];
+console.log("Requesting " + launchMode);
 
-				switch (launchMode) {
-					case LOCALIZABLE_STINGS_MODE:
-						jobs.push(getLocalizableStrings(fulfilledAuthClient, targetSheetID))
-						break
-					case LOCALIZABLE_PLIST_MODE:
-						jobs.push(getLocalizablePlistStrings(fulfilledAuthClient, targetSheetID))
-						break
-					case LOCALIZABLE_STINGS_PLIST_MODE:
-						jobs.push(getLocalizableStrings(fulfilledAuthClient, targetSheetID))
-						jobs.push(getLocalizablePlistStrings(fulfilledAuthClient, targetSheetID))
-						break
-				}
+auth
+	.getGoogleAuth()
+	.then(
+		(fulfilledAuthClient) => {
+			let jobs = [];
 
-				processLocalizationJobs(jobs, exportDirPath);
-
-			},
-			(rejectedAuthClient) => {
-				getNewToken(rejectedAuthClient)
-					.then((fulfilledAuthClient) => {
-						let jobs = [];
-
-						switch (launchMode) {
-							case LOCALIZABLE_STINGS_MODE:
-								jobs.push(getLocalizableStrings(fulfilledAuthClient, targetSheetID))
-								break
-							case LOCALIZABLE_PLIST_MODE:
-								jobs.push(getLocalizablePlistStrings(fulfilledAuthClient, targetSheetID))
-								break
-							case LOCALIZABLE_STINGS_PLIST_MODE:
-								jobs.push(getLocalizableStrings(fulfilledAuthClient, targetSheetID))
-								jobs.push(getLocalizablePlistStrings(fulfilledAuthClient, targetSheetID))
-								break
-						}
-
-						processLocalizationJobs(jobs, exportDirPath);
-					})
+			switch (launchMode) {
+				case LOCALIZABLE_STINGS_MODE:
+					jobs.push(getLocalizableStrings(fulfilledAuthClient, targetSheetID))
+					break
+				case LOCALIZABLE_PLIST_MODE:
+					jobs.push(getLocalizablePlistStrings(fulfilledAuthClient, targetSheetID))
+					break
+				case LOCALIZABLE_STINGS_PLIST_MODE:
+					jobs.push(getLocalizableStrings(fulfilledAuthClient, targetSheetID))
+					jobs.push(getLocalizablePlistStrings(fulfilledAuthClient, targetSheetID))
+					break
 			}
-		)
-});
+
+			processLocalizationJobs(jobs, exportDirPath);
+
+		})
+	.catch((rejectedAuthClient) => {
+		console.log("Cannot authenticate");
+		console.log(rejectedAuthClient);
+	})
 
 function processLocalizationJobs(jobs, exportDirPath) {
 	Promise
@@ -109,7 +94,9 @@ function processLocalizationJobs(jobs, exportDirPath) {
 				return makeLocalizableFiles(val[1], exportDirPath, val[0]);
 			});
 		})
-		.then((promises) => { return Promise.all(promises) })
+		.then((promises) => {
+			return Promise.all(promises)
+		})
 		.then((value) => {
 			console.log(value);
 		})
@@ -119,68 +106,6 @@ function processLocalizationJobs(jobs, exportDirPath) {
 		});
 }
 
-/**
- * Create an OAuth2 client with the given credentials, and then execute the
- * given callback function.
- * @param {Object} credentials The authorization client credentials.
- */
-function authorize(credentials) {
-	const {
-		client_secret,
-		client_id,
-		redirect_uris
-	} = credentials.installed;
-	const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
-
-	return new Promise((resolve, reject) => {
-		fs.readFile(TOKEN_PATH, (err, token) => {
-			if (err) {
-				reject(oAuth2Client);
-			} else {
-				oAuth2Client.setCredentials(JSON.parse(token));
-				resolve(oAuth2Client);
-			}
-		});
-	});
-}
-
-/**
- * Get and store new token after prompting for user authorization, and then
- * execute the given callback with the authorized OAuth2 client.
- * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
- */
-function getNewToken(oAuth2Client) {
-	return new Promise((resolve, reject) => {
-		const authUrl = oAuth2Client.generateAuthUrl({
-			access_type: 'offline',
-			scope: SCOPES,
-		});
-		console.log('Authorize this app by visiting this url:', authUrl);
-		const rl = readline.createInterface({
-			input: process.stdin,
-			output: process.stdout,
-		});
-		rl.question('Enter the code from that page here: ', (code) => {
-			rl.close();
-			oAuth2Client.getToken(code, (err, token) => {
-				if (err) reject(err);
-				oAuth2Client.setCredentials(token);
-				// Store the token to disk for later program executions
-				fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-					if (err) reject(err);
-					console.log('Token stored to', TOKEN_PATH);
-				});
-				resolve(oAuth2Client);
-			});
-		});
-	});
-}
-
-/**
- * Prints the names and majors of students in a sample spreadsheet:
- * @see https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
- * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
- */
 function getLocalizableStrings(auth, targetSheetID) {
 	return new Promise((resolve, reject) => {
 		const sheets = google.sheets({
@@ -282,7 +207,6 @@ function makeLocalizableFiles(sourceJSONFilePath, exportDirPath, launchMode) {
 			});
 		});
 	});
-
 
 	function compileSwift() {
 		return new Promise((resolve, reject) => {
