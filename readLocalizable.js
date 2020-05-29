@@ -1,21 +1,36 @@
 const auth = require('./GoogleAuth')
-
 const fs = require('fs');
+const {
+  google
+} = require('googleapis');
 
 const INPUT_FILE_TOKEN = "-i";
+const TARGET_SHEET_ID_TOKEN = "-s";
 
-let inputToken = process.argv.indexOf(INPUT_FILE_TOKEN);
-if (inputToken != -1) {
-  let inputFilePath = process.argv[inputToken + 1];
+let inputFileTokenIndex = process.argv.indexOf(INPUT_FILE_TOKEN);
+let targetSheetTokenIndex = process.argv.indexOf(TARGET_SHEET_ID_TOKEN);
+
+if (inputFileTokenIndex != -1 && targetSheetTokenIndex != -1) {
+  const targetSheetID = process.argv[targetSheetTokenIndex + 1];
+  const inputFilePath = process.argv[inputFileTokenIndex + 1];
   readLocalizableStringsFile(inputFilePath)
     .then((stringData) => {
       return mapStringsDataToJSON(stringData);
     })
     .then((stringsJSON) => {
-      console.log(stringsJSON);
+      return auth.getGoogleAuth()
+        .then((auth) => {
+          return updateGoogleSheet(stringsJSON, targetSheetID, auth)
+        });
+    })
+    .then((complete) => {
+      console.log(complete);
+    })
+    .catch((err) => {
+      console.log(err);
     });
 } else {
-  console.log("no input token");
+  console.log("Insufficient input");
 }
 
 function readLocalizableStringsFile(inputFilePath) {
@@ -45,8 +60,56 @@ function mapStringsDataToJSON(stringsData) {
   return stringsDict;
 }
 
-function updateGoogleSheet(stringsJSON, sheetID) {
-  return new Promise((resolve, reject) => {
+function updateGoogleSheet(stringsJSON, spreadsheetId, auth) {
 
+  const api = google.sheets({
+    version: 'v4',
+    auth
+  });
+
+  const valueInputOption = 'RAW';
+  const keys = Object
+    .keys(stringsJSON)
+    .reduce((acc, value) => {
+      let c = acc;
+      c.push([value]);
+      return c
+    }, []);
+  const values = Object
+    .values(stringsJSON)
+    .reduce((acc, value) => {
+      let c = acc;
+      c.push([value]);
+      return c
+    }, []);
+
+  const keysRange = "LocalizableStrings!A2:A" + (keys.length + 1);
+  const valuesRange = "LocalizableStrings!B2:B" + (values.length + 1);
+
+  const updateKeys = updateSheet(api, spreadsheetId, valueInputOption, keysRange, {
+    'values': keys
+  });
+  const updateValues = updateSheet(api, spreadsheetId, valueInputOption, valuesRange, {
+    'values': values
+  });
+
+  return Promise.all([updateKeys, updateValues]);
+}
+
+function updateSheet(api, spreadsheetId, valueInputOption, range, resource) {
+  return new Promise((resolve, reject) => {
+    api.spreadsheets.values.update({
+      spreadsheetId,
+      range,
+      valueInputOption,
+      resource,
+    }, (err, _result) => {
+      if (err) {
+        reject(err);
+        return;
+      } else {
+        resolve("Range updated " + range);
+      }
+    });
   });
 }
