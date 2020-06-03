@@ -88,4 +88,6 @@ function getNewToken(oAuth2Client) {
   });
 }
 
-module.exports = { getGoogleAuth };
+module.exports = {
+  getGoogleAuth
+};

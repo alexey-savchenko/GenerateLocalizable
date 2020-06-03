@@ -1,7 +1,9 @@
 const exec = require('child_process').exec;
 const fs = require('fs');
 const auth = require('./GoogleAuth')
-const { google } = require('googleapis');
+const {
+	google
+} = require('googleapis');
 const SCOPE = ['https://www.googleapis.com/auth/spreadsheets'];
 
 const TOKEN_PATH = 'token.json';
@@ -67,7 +69,6 @@ auth
 			}
 
 			processLocalizationJobs(jobs, exportDirPath);
-
 		})
 	.catch((rejectedAuthClient) => {
 		console.log("Cannot authenticate");

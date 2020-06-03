@@ -7,30 +7,34 @@ const {
 const INPUT_FILE_TOKEN = "-i";
 const TARGET_SHEET_ID_TOKEN = "-s";
 
-let inputFileTokenIndex = process.argv.indexOf(INPUT_FILE_TOKEN);
-let targetSheetTokenIndex = process.argv.indexOf(TARGET_SHEET_ID_TOKEN);
+main(process.argv);
 
-if (inputFileTokenIndex != -1 && targetSheetTokenIndex != -1) {
-  const targetSheetID = process.argv[targetSheetTokenIndex + 1];
-  const inputFilePath = process.argv[inputFileTokenIndex + 1];
-  readLocalizableStringsFile(inputFilePath)
-    .then((stringData) => {
-      return mapStringsDataToJSON(stringData);
-    })
-    .then((stringsJSON) => {
-      return auth.getGoogleAuth()
-        .then((auth) => {
-          return updateGoogleSheet(stringsJSON, targetSheetID, auth)
-        });
-    })
-    .then((complete) => {
-      console.log(complete);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-} else {
-  console.log("Insufficient input");
+function main(args) {
+  let inputFileTokenIndex = args.indexOf(INPUT_FILE_TOKEN);
+  let targetSheetTokenIndex = args.indexOf(TARGET_SHEET_ID_TOKEN);
+
+  if (inputFileTokenIndex != -1 && targetSheetTokenIndex != -1) {
+    const targetSheetID = args[targetSheetTokenIndex + 1];
+    const inputFilePath = args[inputFileTokenIndex + 1];
+    readLocalizableStringsFile(inputFilePath)
+      .then((stringData) => {
+        return mapStringsDataToJSON(stringData);
+      })
+      .then((stringsJSON) => {
+        return auth.getGoogleAuth()
+          .then((auth) => {
+            return updateGoogleSheet(stringsJSON, targetSheetID, auth)
+          });
+      })
+      .then((complete) => {
+        console.log(complete);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  } else {
+    console.log("Insufficient input");
+  }
 }
 
 function readLocalizableStringsFile(inputFilePath) {
@@ -113,3 +117,7 @@ function updateSheet(api, spreadsheetId, valueInputOption, range, resource) {
     });
   });
 }
+
+module.exports = {
+  main
+};
