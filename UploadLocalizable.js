@@ -55,10 +55,14 @@ function mapStringsDataToJSON(stringsData) {
   const regexp = /(?<=((?<=[\s,.:;"']|^)["']))(?:(?=(\\?))\2.)*?(?=\1)/gmu;
   const stringsDict = stringsArray.reduce((acc, element) => {
     const matches = element.match(regexp);
-    const key = matches[0];
-    const value = matches[1];
-    acc[key] = value;
-    return acc
+    if (matches[0] != null && matches[1] != null) {
+      const key = matches[0];
+      const value = matches[1];
+      acc[key] = value;
+      return acc
+    } else {
+      return acc
+    }
   }, {});
 
   return stringsDict;
